@@ -21,7 +21,8 @@ import {
   ShieldCheck,
   ChevronLeft,
   X,
-  HelpCircle
+  HelpCircle,
+  MessageSquare
 } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 
@@ -34,6 +35,7 @@ export const NAV_ITEMS = [
   { href: '/technical-lab', label: 'Technical Lab', icon: Cpu },
   { href: '/jury-room', label: 'AI Jury Room', icon: Users2, badge: 'Live AI' },
   { href: '/pitch-arena', label: 'Pitch Arena', icon: Mic2 },
+  { href: '/communication-coach', label: 'Communication Coach', icon: MessageSquare, badge: 'New' },
   { href: '/team-simulator', label: 'Team Simulator', icon: Users },
   { href: '/academy', label: 'Knowledge Academy', icon: GraduationCap },
   { href: '/analytics', label: 'Performance Analytics', icon: LineChart },
