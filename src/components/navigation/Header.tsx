@@ -1,12 +1,25 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
-import { Search, Bell, Sparkles, BookOpen, Menu, Sliders } from 'lucide-react';
+import { Search, Bell, Sparkles, BookOpen, Menu, Sliders, LogIn, UserPlus, LogOut, User } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 
 export function Header() {
-  const { isDemoMode, searchQuery, setSearchQuery, isSidebarOpen, toggleSidebar, openSettingsModal } = useApp();
+  const {
+    isDemoMode,
+    searchQuery,
+    setSearchQuery,
+    isSidebarOpen,
+    toggleSidebar,
+    openSettingsModal,
+    isLoggedIn,
+    openAuthModal,
+    logoutUser,
+    user
+  } = useApp();
+
+  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState<boolean>(false);
 
   return (
     <header className={`h-16 bg-[#0B0F19]/90 backdrop-blur-md border-b border-[#1E293B] sticky top-0 z-30 flex items-center justify-between px-6 transition-all duration-200 ${
@@ -80,6 +93,70 @@ export function Header() {
           <Bell className="w-4 h-4" />
           <span className="w-2 h-2 rounded-full bg-violet-500 absolute top-1.5 right-1.5" />
         </button>
+
+        {/* Authentication Account Controls */}
+        {isLoggedIn ? (
+          <div className="relative">
+            <button
+              onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
+              className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-[#111827] border border-transparent hover:border-[#1E293B] transition-all"
+            >
+              <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-600 flex items-center justify-center text-white text-xs font-bold shadow">
+                {user.name.charAt(0)}
+              </div>
+              <span className="text-xs font-semibold text-slate-200 hidden md:inline max-w-[100px] truncate">
+                {user.name}
+              </span>
+            </button>
+
+            {/* Profile Dropdown */}
+            {isProfileDropdownOpen && (
+              <div className="absolute right-0 mt-2 w-48 bg-[#0F172A] border border-[#1E293B] rounded-xl shadow-2xl py-1.5 z-50 text-xs animate-fadeIn">
+                <div className="px-3.5 py-2 border-b border-[#1E293B]">
+                  <p className="font-bold text-slate-200 truncate">{user.name}</p>
+                  <p className="text-[10px] text-slate-400 truncate">{user.email}</p>
+                </div>
+                <button
+                  onClick={() => {
+                    openSettingsModal();
+                    setIsProfileDropdownOpen(false);
+                  }}
+                  className="w-full text-left px-3.5 py-2 text-slate-300 hover:text-white hover:bg-[#1E293B] flex items-center gap-2"
+                >
+                  <Sliders className="w-3.5 h-3.5 text-purple-400" />
+                  <span>Account Settings</span>
+                </button>
+                <button
+                  onClick={() => {
+                    logoutUser();
+                    setIsProfileDropdownOpen(false);
+                  }}
+                  className="w-full text-left px-3.5 py-2 text-rose-400 hover:text-rose-300 hover:bg-rose-950/30 flex items-center gap-2"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                  <span>Log Out</span>
+                </button>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => openAuthModal('login')}
+              className="px-3 py-1.5 text-xs text-slate-300 hover:text-white font-semibold transition-colors flex items-center gap-1.5"
+            >
+              <LogIn className="w-3.5 h-3.5 text-purple-400" />
+              <span>Log In</span>
+            </button>
+            <button
+              onClick={() => openAuthModal('signup')}
+              className="px-3 py-1.5 text-xs bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg shadow-sm transition-all flex items-center gap-1.5"
+            >
+              <UserPlus className="w-3.5 h-3.5" />
+              <span>Sign Up</span>
+            </button>
+          </div>
+        )}
       </div>
     </header>
   );

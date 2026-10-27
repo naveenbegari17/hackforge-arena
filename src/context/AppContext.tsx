@@ -29,6 +29,13 @@ interface AppContextType {
   isSettingsOpen: boolean;
   openSettingsModal: () => void;
   closeSettingsModal: () => void;
+  isAuthModalOpen: boolean;
+  authMode: 'login' | 'signup';
+  openAuthModal: (mode?: 'login' | 'signup') => void;
+  closeAuthModal: () => void;
+  isLoggedIn: boolean;
+  loginUser: (email: string, name?: string) => void;
+  logoutUser: () => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -45,10 +52,41 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [isSidebarOpen, setSidebarOpen] = useState<boolean>(true);
   const [isSettingsOpen, setSettingsOpen] = useState<boolean>(false);
+  const [isAuthModalOpen, setAuthModalOpen] = useState<boolean>(false);
+  const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(true);
 
   const toggleSidebar = () => setSidebarOpen((prev) => !prev);
   const openSettingsModal = () => setSettingsOpen(true);
   const closeSettingsModal = () => setSettingsOpen(false);
+
+  const openAuthModal = (mode: 'login' | 'signup' = 'login') => {
+    setAuthMode(mode);
+    setAuthModalOpen(true);
+  };
+  const closeAuthModal = () => setAuthModalOpen(false);
+
+  const loginUser = (email: string, name?: string) => {
+    const updatedUser = {
+      ...user,
+      email,
+      name: name || user.name
+    };
+    setUser(updatedUser);
+    setIsLoggedIn(true);
+    try {
+      localStorage.setItem('hackforge_user', JSON.stringify(updatedUser));
+      localStorage.setItem('hackforge_logged_in', 'true');
+    } catch {}
+    closeAuthModal();
+  };
+
+  const logoutUser = () => {
+    setIsLoggedIn(false);
+    try {
+      localStorage.setItem('hackforge_logged_in', 'false');
+    } catch {}
+  };
 
   // Persist state in localStorage for session resilience
   useEffect(() => {
@@ -141,7 +179,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         setSidebarOpen,
         isSettingsOpen,
         openSettingsModal,
-        closeSettingsModal
+        closeSettingsModal,
+        isAuthModalOpen,
+        authMode,
+        openAuthModal,
+        closeAuthModal,
+        isLoggedIn,
+        loginUser,
+        logoutUser
       }}
     >
       {children}
